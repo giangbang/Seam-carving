@@ -3,6 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 SOBEL_KERNEL_SIZE = 3
+MASK_ENERGY = int(1e6)
 
 def gradientEnergyGray(img: np.ndarray)->np.ndarray:
 	sobelx = cv2.Sobel(img,cv2.CV_8U,1,0,\
@@ -11,7 +12,8 @@ def gradientEnergyGray(img: np.ndarray)->np.ndarray:
 				ksize=SOBEL_KERNEL_SIZE).astype(np.int32)
 	return np.square(sobelx) + np.square(sobely)
 	
-def gradientEnergySobel(img: np.ndarray)->np.ndarray:
+def gradientEnergySobel(img: np.ndarray, \
+				keep_mask=None, remove_mask=None)->np.ndarray:
 	if len(img.shape) == 2:
 		result = np.sqrt(gradientEnergyGray(img))
 	else:
@@ -19,7 +21,12 @@ def gradientEnergySobel(img: np.ndarray)->np.ndarray:
 		grad = [gradientEnergyGray(img[...,i]) for i in range(3)]
 		grad = np.array(grad)
 		result = np.sqrt(grad.sum(axis=0))
-				
+		
+	if keep_mask:
+		result[keep_mask] += MASK_ENERGY
+	elif remove_mask:
+		result[remove_mask] -= MASK_ENERGY
+		
 	return result.astype(np.int32)
 	
 if __name__ == '__main__':
