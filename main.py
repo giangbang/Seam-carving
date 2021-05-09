@@ -6,11 +6,11 @@ import numpy as np
 import time
 
 
-img = cv2.imread('images/cat on pavement.jpg')
+img = cv2.imread('images/cat.jpg')
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 h, w = img.shape[:2]
 k = 1
-n = 260
+n = 65
 
 # show gradient
 res = [img, gradientEnergySobel(img)]

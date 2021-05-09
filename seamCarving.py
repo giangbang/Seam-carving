@@ -165,6 +165,9 @@ def seamExpandNaive(img: np.ndarray, n: int, *args, **kwargs)\
 	
 def removeObject(img: np.ndarray, mask: np.ndarray)\
 				->np.ndarray:
+	"""
+	Remove object in image, given mask of that object
+	"""
 	n, h, w = 0, *mask.shape
 	for i in range(h):
 		n = max(n, np.sum(mask[i]))
@@ -177,18 +180,25 @@ if __name__ == '__main__':
 	img = cv2.imread('images/cats.jpg')
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 	h, w = img.shape[:2]
-	k = 1
-	n = 260
+	k = 800
+	n = 140
 	
-	mask = cv2.imread('images/mask.jpg',0)/255
-	mask = np.array(np.round(mask), dtype=np.bool)
-	print(mask.shape)
-	print(img.shape)
+	# mask = cv2.imread('images/mask.jpg',0)/255
+	# mask = np.array(np.round(mask), dtype=np.bool)
+	# print(mask.shape)
+	# print(img.shape)
+	# startTime = time.time()
+	# new_img = removeObject(img, mask)
+	# res = [img, new_img]
+	# elapsedTime = time.time() - startTime
+	
+	
+	# optimal pixel removal
 	startTime = time.time()
-	new_img = removeObject(img, mask)
-	res = [img, new_img]
+	mask, new_img = seamCarve(img, n, k)
+	res = [drawSeamMask(img.copy(), mask), new_img]
 	elapsedTime = time.time() - startTime
-	
+
 
 	print('Elapsed time :{} s'.format(elapsedTime))
 	showImgs(res)
