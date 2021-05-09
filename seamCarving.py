@@ -180,7 +180,7 @@ if __name__ == '__main__':
 	img = cv2.imread('images/cats.jpg')
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 	h, w = img.shape[:2]
-	k = 800
+	k = 0
 	n = 140
 	
 	# mask = cv2.imread('images/mask.jpg',0)/255
