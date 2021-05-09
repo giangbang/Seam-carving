@@ -15,7 +15,9 @@ def showImgs(imgs):
 		else:
 			plt.imshow(img)
 		plt.xticks([]), plt.yticks([])
-	
+	f = plt.gcf()
+	f.set_figheight(6)
+	f.set_figwidth(14)
 	plt.show()
 	
 def drawSeam(img: np.ndarray, seam: np.ndarray)->np.ndarray:

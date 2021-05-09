@@ -6,7 +6,7 @@ INF = int(1e9)
 
 def backTrack(src: int, edgeTo: np.ndarray)->np.ndarray: 
 	"""
-	Back-tracking shortest path from src to top
+	Back-tracking shortest path from src to the top
 	"""
 	h, _ = edgeTo.shape
 	seam = np.empty(h, dtype=np.uint32)
@@ -16,9 +16,11 @@ def backTrack(src: int, edgeTo: np.ndarray)->np.ndarray:
 		index = edgeTo[i, index]
 	return seam
 	
-def findSeamSlow(energy: np.ndarray, k: int) -> np.ndarray:
+def findSeamSlow(energy: np.ndarray, k: int)->np.ndarray:
 	"""
 	Compute the seam coordinates of the image
+	Using dynamic programing approach, traverse all vertices
+	in a DAG in topological order
 	"""
 	assert len(energy.shape) == 2, \
 		'Dimensions of `energy` must be two'
@@ -74,7 +76,7 @@ def removeSeamGray(gray: np.ndarray, seam: np.ndarray)->np.ndarray:
 def removeSeam(img: np.ndarray, seam: np.ndarray)->np.ndarray:
 	"""
 	Remove seam of the image
-	sub-routine `removeSeamGray` for each image channel
+	Sub-routine `removeSeamGray` for each image channel
 	"""
 	assert len(img.shape) <= 3 and len(seam.shape) == 1
 	assert img.shape[0] == len(seam)
@@ -89,8 +91,9 @@ def removeSeam(img: np.ndarray, seam: np.ndarray)->np.ndarray:
 			
 def seamCarve(img: np.ndarray, n: int, \
 				k: int, findSeam=findSeamFast, \
-				energyFunc=gradientEnergySobel)->\
-				(np.ndarray, np.ndarray):
+				energyFunc=gradientEnergySobel,\
+				removeMask=None, keepMask=None)\
+				->(np.ndarray, np.ndarray):
 	"""
 	Get the minimum n seams and carved result of the image
 	"""
@@ -98,7 +101,7 @@ def seamCarve(img: np.ndarray, n: int, \
 	assert n < w
 	seamMask = np.zeros((h, w), dtype=np.bool)
 	indxMap = np.tile(np.arange(0, w), (h, 1))
-	energy = energyFunc(img)
+	energy = energyFunc(img, keepMask, removeMask)
 	rows = np.arange(0, h)
 	for _ in range(n):
 		seam = findSeam(energy, k)
@@ -106,12 +109,20 @@ def seamCarve(img: np.ndarray, n: int, \
 		
 		img = removeSeam(img, seam)
 		indxMap = removeSeam(indxMap, seam)
-		energy = energyFunc(img)
+		if removeMask is not None:
+			removeMask = removeSeam(removeMask, seam)
+		elif keepMask is not None:
+			keepMask = removeSeam(keepMask, seam)
+		energy = energyFunc(img, keepMask, removeMask)
 
 	return seamMask, img
 	
 def insertSeamGray(gray: np.ndarray, seamMask: np.ndarray, n: int)\
 				->np.ndarray:
+	"""
+	Expand n seams to a grayscale image
+	Sub-routine of `seamExpand`
+	"""
 	assert len(gray.shape) == 2
 	h, w = gray.shape
 	output = np.empty((h, w+n), dtype=gray.dtype)
@@ -122,8 +133,12 @@ def insertSeamGray(gray: np.ndarray, seamMask: np.ndarray, n: int)\
 				
 	return output
 	
-def seamExpand(img: np.ndarray, n: int, *args, **kwargs)->\
-				(np.ndarray, np.ndarray):
+def seamExpand(img: np.ndarray, n: int, *args, **kwargs)\
+				->(np.ndarray, np.ndarray):
+	"""
+	Expand n seams to the original image
+	Newly inserted pixels get values from seams' pixel values 
+	"""
 	seamMask, _ = seamCarve(img, n, *args, **kwargs)
 	h, w = seamMask.shape
 	if len(img.shape) == 2:
@@ -136,18 +151,45 @@ def seamExpand(img: np.ndarray, n: int, *args, **kwargs)->\
 	
 	return seamMask, output		
 	
+def seamExpandNaive(img: np.ndarray, n: int, *args, **kwargs)\
+				->np.ndarray:
+	"""
+	Expand n seams to the original image by 
+	finding and inserting the optimum seam
+	"""
+	output = img
+	for _ in range(n):
+		_, output = seamExpand(output, 1, *args, **kwargs)
+		
+	return output
+	
+def removeObject(img: np.ndarray, mask: np.ndarray)\
+				->np.ndarray:
+	n, h, w = 0, *mask.shape
+	for i in range(h):
+		n = max(n, np.sum(mask[i]))
+	_, output = seamCarve(img, n, 1, removeMask=mask)
+	_, output = seamExpand(output, n, 1)
+	return output
+
 if __name__ == '__main__':
 	import time
-	img = cv2.imread('images/cat.jpg')
+	img = cv2.imread('images/cats.jpg')
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 	h, w = img.shape[:2]
 	k = 1
-	startTime = time.time()
+	n = 260
 	
-	mask, new_img = seamExpand(img, 80, k)
-	res = [img, gradientEnergySobel(img), 
-				drawSeamMask(img.copy(), mask), new_img]
+	mask = cv2.imread('images/mask.jpg',0)/255
+	mask = np.array(np.round(mask), dtype=np.bool)
+	print(mask.shape)
+	print(img.shape)
+	startTime = time.time()
+	new_img = removeObject(img, mask)
+	res = [img, new_img]
 	elapsedTime = time.time() - startTime
+	
+
 	print('Elapsed time :{} s'.format(elapsedTime))
 	showImgs(res)
 	

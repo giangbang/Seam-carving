@@ -22,9 +22,9 @@ def gradientEnergySobel(img: np.ndarray, \
 		grad = np.array(grad)
 		result = np.sqrt(grad.sum(axis=0))
 		
-	if keep_mask:
+	if keep_mask is not None:
 		result[keep_mask] += MASK_ENERGY
-	elif remove_mask:
+	elif remove_mask is not None:
 		result[remove_mask] -= MASK_ENERGY
 		
 	return result.astype(np.int32)
