@@ -62,32 +62,19 @@ def findSeamFast(energy: np.ndarray, k: int)->np.ndarray:
 	
 	return backTrack(np.argmin(cost), edgeTo)
 	
-def removeSeamGray(gray: np.ndarray, seam: np.ndarray)->np.ndarray:
-	"""
-	Remove seam of a grayscale image, given seam coordinates
-	"""
-	h, w = gray.shape
-	new_gray = np.empty((h, w-1),dtype=gray.dtype)
-	for i in range(h):
-		new_gray[i, :seam[i]] = gray[i, :seam[i]]
-		new_gray[i, seam[i]:] = gray[i, seam[i]+1:]
-	return new_gray
 	
 def removeSeam(img: np.ndarray, seam: np.ndarray)->np.ndarray:
 	"""
 	Remove seam of the image
-	Sub-routine `removeSeamGray` for each image channel
 	"""
 	assert len(img.shape) <= 3 and len(seam.shape) == 1
 	assert img.shape[0] == len(seam)
 	
-	if len(img.shape) == 2: # grayscale image
-		return removeSeamGray(img, seam)
-	else:
-		assert img.shape[-1] == 3 # rgb img
-		return np.concatenate(\
-			[np.expand_dims(removeSeamGray(img[...,i], seam),-1) for i in range(3)],\
-			axis=-1)
+	h, w = img.shape[:2]
+	new_img = np.empty((h, w-1), dtype=img.dtype)
+	mask = ~np.eye(w, dtype=np.bool)[seam]
+	return img[mask, ...].reshape(h, w-1,-1).squeeze()
+	
 			
 def seamCarve(img: np.ndarray, n: int, \
 				k: int, findSeam=findSeamFast, \
@@ -177,11 +164,11 @@ def removeObject(img: np.ndarray, mask: np.ndarray)\
 
 if __name__ == '__main__':
 	import time
-	img = cv2.imread('images/cats.jpg')
+	img = cv2.imread('images/cat.jpg')
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 	h, w = img.shape[:2]
-	k = 0
-	n = 140
+	k = 1
+	n = 70
 	
 	# mask = cv2.imread('images/mask.jpg',0)/255
 	# mask = np.array(np.round(mask), dtype=np.bool)
@@ -195,8 +182,9 @@ if __name__ == '__main__':
 	
 	# optimal pixel removal
 	startTime = time.time()
-	mask, new_img = seamCarve(img, n, k)
-	res = [drawSeamMask(img.copy(), mask), new_img]
+	mask, new_img = seamCarve(img, n, k, 
+		energyFunc=gradientEnergyLaplace)
+	res = [drawSeamMask(img, mask), new_img]
 	elapsedTime = time.time() - startTime
 
 

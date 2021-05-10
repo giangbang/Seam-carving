@@ -46,6 +46,17 @@ Given the mask of the object, the algorithm firstly use seam carving to remove t
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cat_on_pav_carve.jpeg">
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cat_on_pav_expand.jpeg">
 
+Other energy functions
+
+<img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cat_grad_laplace.png">
+<img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cat_expand_laplace.png">
+<img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cat_shrink_laplace.png">
+<img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cats_laplace_grad.png">
+<img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cats_laplace_expand.png">
+<img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cats_laplace_shrink.png">
+<img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cat_op_exp.png">
+
+
 ## Code structure
 `seamCarving.py`: all the main code are put in here.
 * `findSeamSlow`: finding coordinates of one optimal seam. Using dynamic programing approach, traverse all vertices in a DAG in topological order.

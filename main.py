@@ -10,15 +10,16 @@ img = cv2.imread('images/cat.jpg')
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 h, w = img.shape[:2]
 k = 1
-n = 65
+n = 100
 
 # show gradient
-res = [img, gradientEnergySobel(img)]
+res = [img, gradientEnergyLaplace(img)]
 showImgs(res)
 
 # show seam expand
 startTime = time.time()
-mask, new_img = seamExpand(img, n, k)
+mask, new_img = seamExpand(img, n, k,
+	energyFunc=gradientEnergyLaplace)
 res = [drawSeamMask(img.copy(), mask), new_img]
 elapsedTime = time.time() - startTime
 
@@ -27,7 +28,8 @@ showImgs(res)
 
 # show seam carve
 startTime = time.time()
-mask, new_img = seamCarve(img, n, k)
+mask, new_img = seamCarve(img, n, k,
+	energyFunc=gradientEnergyLaplace)
 res = [drawSeamMask(img.copy(), mask), new_img]
 elapsedTime = time.time() - startTime
 
