@@ -1,11 +1,11 @@
 # Seam carving
-Python implementation of seam carving.
+Python implementation of <a href="https://perso.crans.org/frenoy/matlab2012/seamcarving.pdf">seam carving</a>.
 
 ## Libraries
 * OpenCV
 * numpy
 
-## Seam carving
+## Seam carving idea
 The idea of seam carving is to remove unnoticeable pixels that blend with their surroundings.
 => Need an energy function, e.g gradient, to measure importance of pixels.
 
