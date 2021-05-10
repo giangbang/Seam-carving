@@ -1,5 +1,5 @@
 # Seam carving
-Python implementation of seam carving
+Python implementation of seam carving.
 
 ## Libraries
 * OpenCV
@@ -7,11 +7,11 @@ Python implementation of seam carving
 
 ## Seam carving
 The idea of seam carving is to remove unnoticeable pixels that blend with their surroundings.
-=> Need an energy function, e.g gradient, to measure importance of pixels
+=> Need an energy function, e.g gradient, to measure importance of pixels.
 
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/gradient.png">
 
-Given an energy function, the first strategy is to remove an equal number of low energy pixels from every row. However, this will destroy the image content by zig zag effect
+Given an energy function, the first strategy is to remove an equal number of low energy pixels from every row. However, this will destroy the image content by zig zag effect.
 
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/optimal%20pixel%20removal.jpeg">
 
@@ -25,16 +25,16 @@ Seam carving is a resizing strategy somewhat in between the two above, it's less
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/carve.png">
 
 ## Seam expanding
-To enlarge an image, one can insert new seam instead of remove it as in seam carving. Naturally, optimal seams are inserted until desired size is reached
+To enlarge an image, one can insert new seams instead of removing them as in seam carving. Naturally, optimal seams are inserted until the desired size is reached.
 
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/naiveExpand.png">
 
-Unfortunately, this approach does not work as it create a stretching artifact by choosing the same seam. Another idea is to find the first `k` seams for removal, and then duplicate them instead of removing
+Unfortunately, this approach does not work as it creates a stretching artifact by choosing the same seam. Another idea is to find the first `k` seams for removal, and then duplicate them instead of removing.
 
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/expand.png">
 
 ## Object removal
-Given the mask of the object, the algorithm firstly use seam carving to remove the mask region and expand it to the orginal size. Energy of pixels within mask region are subtracted to attract seam to travel through them.
+Given the mask of the object, the algorithm firstly uses seam carving to remove the mask region and expands it to the orginal size. Energy of pixels within mask region are subtracted to attract seams to travel through them.
 
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/object%20removal.jpeg">
 
@@ -46,7 +46,7 @@ Given the mask of the object, the algorithm firstly use seam carving to remove t
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cat_on_pav_carve.jpeg">
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cat_on_pav_expand.jpeg">
 
-Other energy functions
+Other energy functions:
 
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cat_grad_laplace.png">
 <img src="https://github.com/giangbang/Seam-carving/blob/master/demo/cat_expand_laplace.png">

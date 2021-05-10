@@ -7,16 +7,15 @@ SOBEL_KERNEL_SIZE = 1
 MASK_ENERGY = int(1e6)
 
 def gradientEnergyGray(img: np.ndarray)->np.ndarray:
-	sobelx = cv2.Sobel(img,cv2.CV_8U,1,0,\
-				ksize=SOBEL_KERNEL_SIZE).astype(np.int32)
-	sobely = cv2.Sobel(img,cv2.CV_8U,0,1,\
-				ksize=SOBEL_KERNEL_SIZE).astype(np.int32)
+	sobelx = cv2.Sobel(img,cv2.CV_32F,1,0,\
+				ksize=SOBEL_KERNEL_SIZE)
+	sobely = cv2.Sobel(img,cv2.CV_32F,0,1,\
+				ksize=SOBEL_KERNEL_SIZE)
 
 	return np.square(sobelx) + np.square(sobely)
 	
 def LaplaceGray(img: np.ndarray)->np.ndarray:
-	res = np.array(cv2.Laplacian(img,cv2.CV_64F))
-
+	res = np.array(cv2.Laplacian(img,cv2.CV_32F))
 	return res*res
 
 def gradientEnergyLaplace(img: np.ndarray, \
